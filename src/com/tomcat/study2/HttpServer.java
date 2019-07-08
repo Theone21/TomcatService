@@ -1,4 +1,4 @@
-package com.tomcat.study1;
+package com.tomcat.study2;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,13 +45,24 @@ public class HttpServer {
 				request.parse();
 				Response response = new Response(output);
 				response.setRequest(request);
-				response.sendStaticResource();
+//				response.sendStaticResource();
+				if(request.getUri() == null){
+					continue;
+				}
+				if (request.getUri().startsWith("/servlet/")) {
+					ServletProcess1 processor = new ServletProcess1();
+					processor.process(request, response);
+				} else {
+					StaticResourceProcessor processor = new StaticResourceProcessor();
+					processor.process(request, response);
+				}
 				socket.close();
 				shutdown = SHUTDOWN_COMMAND.equals(request.getUri());
 				
-			} catch (IOException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 				continue;
+			} finally {
 			}
 		}
 	}
